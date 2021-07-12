@@ -2,6 +2,7 @@ import json
 from unittest import TestCase
 
 from companies.models import Company
+#from coronavstech.companies.models import Company
 from django.test import Client
 from django.urls import reverse
 import pytest
@@ -79,3 +80,37 @@ class TestPostCompanies(BasicCompanyAPITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("Wrong", str(response.content))
         self.assertIn("is not a valid choice", str(response.content))
+
+    @pytest.mark.xfail
+    def test_should_be_ok_if_fails(self) -> None:
+        self.assertEqual(1,2)
+
+
+def raise_covid19_exception() -> None:
+    raise ValueError("CoronaVirus Exception")
+
+def test_raise_covid19_exception() -> None:
+    with pytest.raises(ValueError) as e:
+        raise_covid19_exception()
+    assert "CoronaVirus Exception" == str(e.value)
+
+
+
+
+import logging
+logger = logging.getLogger("Corona_LOGS")
+
+def funciton_that_logs_something() -> None:
+    try:
+        raise ValueError("CoronaVirus Exception")
+    except ValueError as e:
+        logger.warning(f"I am logging {str(e)}")
+
+def test_logged_warning_level(caplog) -> None:
+    funciton_that_logs_something()
+    assert "I am logging CoronaVirus Exception" in caplog.text
+
+def test_logged_info_level(caplog) -> None:
+    with caplog.at_level(logging.INFO):
+        logger.info("I am logging info level")
+        assert "I am logging info level" in caplog.text
